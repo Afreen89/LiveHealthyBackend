@@ -1,55 +1,147 @@
-﻿namespace SimulatedDevice
+﻿// Copyright (c) Microsoft. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+
+// This application uses the Azure IoT Hub device SDK for .NET
+// For samples see: https://github.com/Azure/azure-iot-sdk-csharp/tree/master/iothub/device/samples
+
+using Microsoft.Azure.Devices.Client;
+using System;
+using System.Linq;
+using System.Text;
+using System.Text.Json;
+using System.Threading;
+using System.Threading.Tasks;
+
+namespace SimulatedDevice
 {
-    using System;
-    using System.Text;
-    using System.Threading.Tasks;
-    using Microsoft.Azure.Devices.Client;
-    using Newtonsoft.Json;
-
-    public class Program
+    /// <summary>
+    /// This sample illustrates the very basics of a device app sending telemetry. For a more comprehensive device app sample, please see
+    /// <see href="https://github.com/Azure-Samples/azure-iot-samples-csharp/tree/master/iot-hub/Samples/device/DeviceReconnectionSample"/>.
+    /// </summary>
+    internal class Program
     {
-        private const string IotHubUri = "{iot hub hostname}";
-        private const string DeviceKey = "{device key}";
-        private const string DeviceId = "myFirstDevice";
-        private const double MinTemperature = 20;
-        private const double MinHumidity = 60;
-        private static readonly Random Rand = new Random();
-        private static DeviceClient _deviceClient;
-        private static int _messageId = 1;
+        public static string userEmail = "muhammadarshad0910@gmail.com";
+        public static string userPassword = "1234";
+        
+        private static DeviceClient s_deviceClient;
+        private static readonly TransportType s_transportType = TransportType.Mqtt;
 
-        private static async void SendDeviceToCloudMessagesAsync()
+        // The device connection string to authenticate the device with your IoT hub.
+        // Using the Azure CLI:
+        // az iot hub device-identity show-connection-string --hub-name {YourIoTHubName} --device-id MyDotnetDevice --output table
+        private static string s_connectionString = "HostName=LiveHealthyHub.azure-devices.net;DeviceId=PatientMonitorSD;SharedAccessKey=mbSORE7uA7P4H7elfeOgGDQZU/7WKyMnzDb0ttMQaW4=";
+		
+        private static async Task Main(string[] args)
         {
-            while (true)
+            Console.WriteLine("IoT Hub Quickstarts #1 - Simulated device.");
+
+            // This sample accepts the device connection string as a parameter, if present
+            ValidateConnectionString(args);
+
+            // Connect to the IoT hub using the MQTT protocol
+            s_deviceClient = DeviceClient.CreateFromConnectionString(s_connectionString, s_transportType);
+
+            // Set up a condition to quit the sample
+            Console.WriteLine("Press control-C to exit.");
+            using var cts = new CancellationTokenSource();
+            Console.CancelKeyPress += (sender, eventArgs) =>
             {
-                var currentTemperature = MinTemperature + Rand.NextDouble() * 15;
-                var currentHumidity = MinHumidity + Rand.NextDouble() * 20;
+                eventArgs.Cancel = true;
+                cts.Cancel();
+                Console.WriteLine("Exiting...");
+            };
 
-                var telemetryDataPoint = new
+            // Run the telemetry loop
+            await SendDeviceToCloudMessagesAsync(cts.Token);
+
+            s_deviceClient.Dispose();
+            Console.WriteLine("Device simulator finished.");
+        }
+
+        private static void ValidateConnectionString(string[] args)
+        {
+            if (args.Any())
+            {
+                try
                 {
-                    messageId = _messageId++,
-                    deviceId = DeviceId,
-                    temperature = currentTemperature,
-                    humidity = currentHumidity
-                };
-                var messageString = JsonConvert.SerializeObject(telemetryDataPoint);
-                var message = new Message(Encoding.ASCII.GetBytes(messageString));
-                message.Properties.Add("temperatureAlert", (currentTemperature > 30) ? "true" : "false");
-
-                await _deviceClient.SendEventAsync(message);
-                Console.WriteLine("{0} > Sending message: {1}", DateTime.Now, messageString);
-
-                await Task.Delay(1000);
+                    var cs = IotHubConnectionStringBuilder.Create(args[0]);
+                    s_connectionString = cs.ToString();
+                }
+                catch (Exception)
+                {
+                    Console.WriteLine($"Error: Unrecognizable parameter '{args[0]}' as connection string.");
+                    Environment.Exit(1);
+                }
+            }
+            else
+            {
+                try
+                {
+                    _ = IotHubConnectionStringBuilder.Create(s_connectionString);
+                }
+                catch (Exception)
+                {
+                    // Console.WriteLine("This sample needs a device connection string to run. Program.cs can be edited to specify it, or it can be included on the command-line as the only parameter.");
+                    Environment.Exit(1);
+                }
             }
         }
 
-        private static void Main(string[] args)
+        // Async method to send simulated telemetry
+        private static async Task SendDeviceToCloudMessagesAsync(CancellationToken ct)
         {
-            Console.WriteLine("Simulated device\n");
-            _deviceClient = DeviceClient.Create(IotHubUri, new DeviceAuthenticationWithRegistrySymmetricKey(DeviceId, DeviceKey), TransportType.Mqtt);
-            _deviceClient.ProductInfo = "HappyPath_Simulated-CSharp";
+            var rand = new Random();
 
-            SendDeviceToCloudMessagesAsync();
-            Console.ReadLine();
+            // patient random data generator 
+            double pTemperatureMin = 20;
+            double pHeartRateMin = 72;
+            double pBloodPressureMin = 150;
+            double pWeightMin = 70;
+            double pHeightMin = 160;
+            string pName = "Arshad Khan";
+            
+            while (!ct.IsCancellationRequested)
+            {
+
+                // generating random data for pName-patient
+                double pTemperature = pTemperatureMin + rand.NextDouble() * 15;
+                double pHeartRate = pHeartRateMin + rand.NextDouble() * 25;
+                double pBloodPressure = pBloodPressureMin + rand.NextDouble() * 15;
+                double pWeight = pWeightMin + rand.NextDouble() * 5;
+                double pHeight = pHeightMin + rand.NextDouble() * 5;
+
+                // Create JSON message
+                string messageBody = JsonSerializer.Serialize(
+                    new
+                    {
+                        pEmail = userEmail,
+                        pPassword = userPassword,
+                        pName = pName,
+                        pTemperature = pTemperature,
+                        pHeartRate = pHeartRate,
+                        pBloodPressure = pBloodPressure,
+                        pWeight = pWeight,
+                        pHeight = pHeight
+                    });
+
+                using var message = new Message(Encoding.ASCII.GetBytes(messageBody))
+                {
+                    ContentType = "application/json",
+                    ContentEncoding = "utf-8",
+                };
+
+                // Add a custom application property to the message.
+                // An IoT hub can filter on these properties without access to the message body.
+                message.Properties.Add("pBodyTemperatureAlert", (pTemperature > 30) ? "true" : "false");
+                message.Properties.Add("pHeartRateAlert", (pHeartRate > 100) ? "true" : "false");
+                message.Properties.Add("pBloodPressureAlert", (pBloodPressure > 180) ? "true" : "false");
+
+                // Send the telemetry message
+                await s_deviceClient.SendEventAsync(message);
+                Console.WriteLine($"{DateTime.Now} > Sending telemetry data: {messageBody}");
+
+                await Task.Delay(10000);
+            }
         }
     }
 }
