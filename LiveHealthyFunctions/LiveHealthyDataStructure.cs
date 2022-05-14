@@ -1,4 +1,5 @@
 using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace LiveHealthy
 {
@@ -36,6 +37,13 @@ namespace LiveHealthy
         public UserProfile data {get; set;}
     }
 
+    public class DataHTttpResponse 
+    {
+        public string message {get; set;}
+        public int error {get; set;}
+        public List<UserData> data {get; set;}
+    }
+
     enum UserHttpErrorCodes {
         SUCCESS_STATUS = 0,
         MISSING_EMAIL = -1,
@@ -48,6 +56,7 @@ namespace LiveHealthy
         WRONG_PASSWORD = -8,
         USER_NOT_FOUND = -9,
         UNKNOWN_ERROR = -10,
-        
+        EMAIL_AND_OR_PASSWORD_NOT_FOUND = -11,
+        PROFILE_DOES_NOT_EXIST = -12,
     }
 }
