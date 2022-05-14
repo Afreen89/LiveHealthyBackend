@@ -1,6 +1,6 @@
 # Setup Up 
 
-## Create a new resource group 
+## Resource Group 
 
 ```bash
 # create a new resource group
@@ -13,7 +13,7 @@ $ az group delete --name exampleGroup
 ```
 
 
-## Create a new IoT hub
+## IoT Hub and Data Structure
 
 ```bash
 # create a iot hub. Name should be globally unique
@@ -47,7 +47,7 @@ The structure of the telemetry data will be:
 // Please note that *pEmail* and *pPassword* will be used to retrieve specific patient data from the HTTPS function on the static web app. 
 ```
 
-## Create a DB & Collections
+## Database & Collections
 
 I created a fake medicalrecord-cosmosdb and under this I created LiveHealthyDB. This DB will have 2 collections tables. One will hold the patients profiles i.e. *LiveHealthyDbUserProfiles* and the other will hold all the telemetry data i.e. *LiveHealthyDbUserData*.
 
@@ -71,3 +71,37 @@ The structure of the *LiveHealthyDbUserProfiles* will be as follows:
 
 - For sign in page, we will use hte email and password of an already existing account.
 
+
+## Azure Function App: 
+
+For data retrieval, I created one IoTHub Trigger and 5 Http Trigger as following: 
+
+- *LiveHealthyFunctions.cs* - IoThub Trigger Function - Store device data to DB.
+- *SignInFunction.cs* - Http Trigger - Retrieves user profile from DB when email and password is passed.
+- *SignUpFunction.cs* - Http Trigger - Saves a profile for new user in DB when a new profile is passed (see UserProfile data structure).
+- *RetrieveUserPassword.cs* - Http Trigger - Retrieve the user profile/password when first, last names and email is passed. 
+- *GetUserData.cs* - Http Trigger - Retrieves all the user data saved by IoTHub trigger (for specific simulated device i.e. specific user) when the email and password is passed. 
+- *EditUserProfile* - HttpTrigger - NOT USED! 
+
+
+Please note that most of the functions are written so that they can either take Query arguments in the http-link request or take a separate request body. The HTTP code look for same arguments in both places. For static web app, the arguments/request params are passed using Query instead of a separate request body.
+
+## Static Web App: 
+
+The LiveHealthy static web app is written on VueJS. In addition the VueJs is using apex-chart library for graphs, Bootstrap for CSS and table, Axios to send the HTTP requests (to Azure Http Functions) and vue-router to move around the pages (from sign in to sign up and dashboard etc.)
+
+The app is automatically deployed everytime a commit is pushed to remote repository and GitHub actions (which were pre-configured for the Azure-VueJs project) are triggered that help in deploying the web-app online. The deployment workflow can be seen on the following git-link: 
+
+```bash
+# GitHub Actions Deployment workflow: 
+https://github.com/Afreen89/LiveHealthyClient/actions 
+```
+
+
+
+The web-app is live on the following link: 
+
+```bash
+# Web ap link: 
+https://thankful-grass-0f213b90f.1.azurestaticapps.net/
+```
