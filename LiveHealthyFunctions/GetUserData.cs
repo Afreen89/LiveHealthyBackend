@@ -17,8 +17,8 @@ namespace LiveHealthy
         public static async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HttpRequest req,
             [CosmosDB(
-                databaseName: "LiveHealthyDB",
-                collectionName: "LiveHealthyDbUserData",
+                databaseName: "UsersData",
+                collectionName: "userdata",
                 ConnectionStringSetting = "cosmosDBConnectionString",
                 SqlQuery = "SELECT * FROM c")] IEnumerable<UserData> userDataArray,
             ILogger log)
@@ -70,7 +70,6 @@ namespace LiveHealthy
                 }
 
             }
-
 
             return new OkObjectResult(response);
         }

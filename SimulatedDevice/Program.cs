@@ -20,7 +20,7 @@ namespace SimulatedDevice
     /// </summary>
     internal class Program
     {
-        public static string userEmail = "muhammadarshad0910@gmail.com";
+        public static string userEmail = "afreen.naz@gmail.com";
         public static string userPassword = "1234";
         
         private static DeviceClient s_deviceClient;
@@ -29,11 +29,11 @@ namespace SimulatedDevice
         // The device connection string to authenticate the device with your IoT hub.
         // Using the Azure CLI:
         // az iot hub device-identity show-connection-string --hub-name {YourIoTHubName} --device-id MyDotnetDevice --output table
-        private static string s_connectionString = "HostName=LiveHealthyHub.azure-devices.net;DeviceId=PatientMonitorSD;SharedAccessKey=mbSORE7uA7P4H7elfeOgGDQZU/7WKyMnzDb0ttMQaW4=";
+        // look in IoT Explroer or Azure portal under ResourceGroup->IoT-Hub->Devices
+        private static string s_connectionString = "HostName=cloudassignment-hub.azure-devices.net;DeviceId=cloudassignment-iot-hub-device;SharedAccessKey=qv8ZCO0iJsRw5v7LpQRzFO2pmAqkZLimspax1n1At0E=";
 		
         private static async Task Main(string[] args)
         {
-            Console.WriteLine("IoT Hub Quickstarts #1 - Simulated device.");
 
             // This sample accepts the device connection string as a parameter, if present
             ValidateConnectionString(args);
@@ -55,7 +55,7 @@ namespace SimulatedDevice
             await SendDeviceToCloudMessagesAsync(cts.Token);
 
             s_deviceClient.Dispose();
-            Console.WriteLine("Device simulator finished.");
+            Console.WriteLine("LiveHealthy simulator finished.");
         }
 
         private static void ValidateConnectionString(string[] args)

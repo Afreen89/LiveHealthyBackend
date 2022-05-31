@@ -2,7 +2,7 @@ using Newtonsoft.Json;
 using System.Collections.Generic;
 
 namespace LiveHealthy
-{
+{    
     public class UserData 
     {
         [JsonProperty("id")]

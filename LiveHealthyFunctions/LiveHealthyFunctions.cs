@@ -19,9 +19,9 @@ namespace LiveHealthy
         
         [FunctionName("LiveHealthyFunctions")]
         public void Run([IoTHubTrigger("messages/events", Connection = "AzureEventHubConnectionString")]EventData message, 
-        [CosmosDB(
-            databaseName: "LiveHealthyDB",
-            collectionName: "LiveHealthyDbUserData",
+        [CosmosDB( 
+            databaseName: "UserData",
+            collectionName: "userdata",
             ConnectionStringSetting = "cosmosDBConnectionString")] out UserData output,
             ILogger log
         )
