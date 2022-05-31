@@ -21,7 +21,7 @@ namespace SimulatedDevice
     internal class Program
     {
         public static string userEmail = "afreen.naz@gmail.com";
-        public static string userPassword = "1234";
+        public static string userPassword = "123";
         
         private static DeviceClient s_deviceClient;
         private static readonly TransportType s_transportType = TransportType.Mqtt;
@@ -98,7 +98,7 @@ namespace SimulatedDevice
             double pBloodPressureMin = 150;
             double pWeightMin = 70;
             double pHeightMin = 160;
-            string pName = "Arshad Khan";
+            string pName = "Afreen Naz";
             
             while (!ct.IsCancellationRequested)
             {

@@ -253,4 +253,4 @@ paket-files/
 .idea/
 *.sln.iml
 
-LiveHealthyFunctions\local.settings.old.json
+./LiveHealthyFunctions\local.settings.old.json
