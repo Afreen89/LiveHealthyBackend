@@ -21,7 +21,7 @@ namespace LiveHealthy
         public void Run([IoTHubTrigger("messages/events", Connection = "AzureEventHubConnectionString")]EventData message, 
         [CosmosDB( 
             databaseName: "UserData",
-            collectionName: "userprofile",
+            collectionName: "userdata",
             ConnectionStringSetting = "cosmosDBConnectionString")] out UserData output,
             ILogger log
         )
