@@ -17,8 +17,8 @@ namespace LiveHealthy
         public static async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HttpRequest req,
             [CosmosDB(
-                databaseName: "Users",
-                collectionName: "users",
+                databaseName: "UserData",
+                collectionName: "userprofile",
                 ConnectionStringSetting = "cosmosDBConnectionString",
                 SqlQuery = "SELECT * FROM c")] IEnumerable<UserProfile> userProfiles,
             ILogger log)
