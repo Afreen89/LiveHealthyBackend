@@ -49,9 +49,9 @@ The structure of the telemetry data will be:
 
 ## Database & Collections
 
-I created a fake medicalrecord-cosmosdb and under this I created LiveHealthyDB. This DB will have 2 collections tables. One will hold the patients profiles i.e. *LiveHealthyDbUserProfiles* and the other will hold all the telemetry data i.e. *LiveHealthyDbUserData*.
+I created a *cloudassignment-cosmos* and under this I created *UserData*. This DB will have 2 collections tables. One will hold the patients profiles i.e. *userprofile* and the other will hold all the telemetry data i.e. *userdata*.
 
-The structure of the *LiveHealthyDbUserProfiles* will be as follows: 
+The structure of the *userprofile* will be as follows: 
 
 ```json
 {
@@ -69,7 +69,7 @@ The structure of the *LiveHealthyDbUserProfiles* will be as follows:
 
 - This profile will be created based on the Sign Up option on the static web app. 
 
-- For sign in page, we will use hte email and password of an already existing account.
+- For sign in page, we will use the email and password of an already existing account.
 
 
 ## Azure Function App: 
@@ -86,7 +86,14 @@ For data retrieval, I created one IoTHub Trigger and 5 Http Trigger as following
 
 Please note that most of the functions are written so that they can either take Query arguments in the http-link request or take a separate request body. The HTTP code look for same arguments in both places. For static web app, the arguments/request params are passed using Query instead of a separate request body.
 
-## Static Web App: 
+**Automatic Deployment Using Github Actions**
+
+The functions are automatically deployed to Azure Function App whenever a new commit is pushed (or a new PR is merged) into the *second-subscription* branch of this repository.
+
+## Static Web App:
+
+The codes for static web app/client is in a separate repository (LiveHealthyClient). Please see the *second-subscription* branch instead of *main*.
+
 
 The LiveHealthy static web app is written on VueJS. In addition the VueJs is using apex-chart library for graphs, Bootstrap for CSS and table, Axios to send the HTTP requests (to Azure Http Functions) and vue-router to move around the pages (from sign in to sign up and dashboard etc.)
 
